@@ -7,11 +7,14 @@ const app = express();
 app.use(bodyparse.json())
 const { errorHandler } = require("./middlewares/error-handler.middleware")
 const { routeNotFound } = require("./middlewares/route-not-found.middleware")
+const { verifyAuth } = require("./middlewares/verifyAuth.middleware")
 app.use(cors());
 
 const user = require("./routes/user.router.js")
 const data = require("./routes/data.router.js")
 const question=require("./routes/question.router");
+const login=require("./routes/login.router.js");
+const signup=require("./routes/signup.router.js");
 //mongoose conn
 
 mongoose.connect(process.env['DB_CONNECTION'],{useNewUrlParser: true, useUnifiedTopology: true}).then(()=>{console.log("mongoose connected")})
@@ -21,9 +24,11 @@ app.get("/", (req, res) => {
   res.send("quiz api")
 })
 
-app.use('/user', user);
-app.use('/data', data);
+app.use('/user',verifyAuth, user);
+app.use('/data',verifyAuth,data);
 app.use('/question',question)
+app.use('/login',login);
+app.use('/signup',signup)
 app.use(routeNotFound);
 app.use(errorHandler);
 

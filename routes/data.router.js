@@ -14,8 +14,8 @@ function month(dateinfo=new Date()){
 router.route('/')
  .post(async (req, res) => {
    try{
-     let {userid}=req.body;
-     const data=await datamodel.findOne({user:userid}).populate({path:"user",select:["name","email","password"]});
+     let {userId}=req;
+     const data=await datamodel.findOne({user:userId}).populate({path:"user",select:["name","email","password"]});
      res.json(data)
    }
    catch (error){
@@ -26,9 +26,10 @@ router.route('/')
  router.route("/save")
   .post(async (req, res) => {
    try{
-     let {userid,quizdata}=req.body;
-     console.log(userid,quizdata);
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req
+     let {quizdata}=req.body;
+     console.log(userId,quizdata);
+     let data=await datamodel.findOne({user:userId});
      console.log({data});
      if(data)
      {
@@ -41,7 +42,7 @@ router.route('/')
        await data.save();
      }
      else{
-     data=await datamodel.create({user:userid,dataset:[quizdata]});
+     data=await datamodel.create({user:userId,dataset:[quizdata]});
      }
      res.json(data)
    }
@@ -54,8 +55,9 @@ router.route('/')
 router.route('/stat')
  .post(async (req, res) => {
    try{
-     let {userid,category}=req.body;
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req
+     let {category}=req.body;
+     const data=await datamodel.findOne({user:userId});
      const statdata=data.dataset.filter(item=>item.category===category);
      const sevendaysdata=statdata.filter(item => {
       return Math.floor( Math.abs( new Date() - new Date( item.Date )) / 86400000)<= 7});
@@ -72,8 +74,9 @@ router.route('/stat')
  router.route('/attendance')
  .post(async (req, res) => {
    try{
-     let {userid}=req.body;
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req;
+     const data=await datamodel.findOne({user:userId});
+     console.log(data)
      let datearr=data.dataset.map(item=>date(item.Date));
      datearr=datearr.filter((item,index) => datearr.indexOf(item) === index);
     const attendancedata=datearr.map(item => {
@@ -89,8 +92,8 @@ router.route('/stat')
 router.route('/monthlyperformance')
  .post(async (req, res) => {
    try{
-     let {userid}=req.body;
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req;
+     const data=await datamodel.findOne({user:userId});
      const statdata=data.dataset.filter(item=>month(item.Date)===month()&&year(item.Date)===year());
       const reducedtotalscore=statdata.reduce((total,item)=>{console.log("total",item.totalscore)
       return total+item.totalscore},0)
@@ -105,8 +108,8 @@ router.route('/monthlyperformance')
  router.route('/yearlyperformance')
  .post(async (req, res) => {
    try{
-     let {userid}=req.body;
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req;
+     const data=await datamodel.findOne({user:userId});
      const statdata=data.dataset.filter(item=>year(item.Date)===year());
      const reducedtotalscore=statdata.reduce((total,item)=>{console.log("total",item.totalscore)
      return total+item.totalscore},0)
@@ -121,8 +124,8 @@ router.route('/monthlyperformance')
  router.route('/dailyperformance')
  .post(async (req, res) => {
    try{
-     let {userid}=req.body;
-     const data=await datamodel.findOne({user:userid});
+     let {userId}=req;
+     const data=await datamodel.findOne({user:userId});
      const statdata=data.dataset.filter(item=>date(item.Date)===date());
       const reducedtotalscore=statdata.reduce((total,item)=>{console.log("total",item.totalscore)
       return total+item.totalscore},0)

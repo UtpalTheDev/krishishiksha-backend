@@ -7,8 +7,9 @@ const {questionmodel}=require("../models/question.model.js")
 router.route('/')
  .get(async (req, res) => {
    try{
-     const question=await questionmodel.find({});
-     res.status(200).json(question)
+     let question=await questionmodel.find({}).select("-__v -_id");
+    
+     res.status(200).json(question[0])
    }
    catch (error){
      res.status(500).json({success:500,message:"unable to get questions",errormessage:error.message})
